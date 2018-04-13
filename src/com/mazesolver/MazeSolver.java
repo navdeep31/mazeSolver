@@ -3,8 +3,9 @@ package com.mazesolver;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
-
+//http://www.baeldung.com/java-solve-maze
 public class MazeSolver {
 
     private int mazeWidth;
@@ -62,6 +63,27 @@ public class MazeSolver {
         this.mazeArray[row][col] = mazeChar;
     }
 
+    public boolean isValidLocation{
+
+    }
+
+    public boolean isExplored{
+
+    }
+
+    public boolean isWall{
+
+    }
+
+    public boolean setVisited{
+
+    }
+
+    public boolean isExit{
+
+    }
+
+
     //Constructor
     public MazeSolver(int mazeWidth, int mazeHeight, Point mazeStart, Point mazeEnd, char[][] mazeArray) {
         this.mazeWidth = mazeWidth;
@@ -91,6 +113,56 @@ public class MazeSolver {
         return maze;
 
     }
+
+    //Array of possible directions - right, up, left, down
+    private static final int[][] directions = {{0,1},{1,0},{0,-1},{-1,0}};
+
+    //Calculate next coordinate path takes - current coordinate + a direction
+    private Point getNextCoordinate( int row, int col, int x, int y) {
+        return new Point(row + x, col + y);
+    }
+
+
+    //Solve
+    public List<Point> solve(MazeSolver maze) {
+        List<Point> path = new ArrayList<>();
+        if (explore(maze, maze.getEntry().getX(), maze.getEntry().getY(), path)) {
+            return path;
+        }
+        return Collections.emptyList();
+    }
+
+    //
+    private boolean explore(MazeSolver maze, int row, int col, List<Point> path) {
+        if (  !maze.isValidLocation(row, col) || maze.isWall(row, col)|| maze.isExplored(row, col) {
+            return false;
+        }
+
+        path.add(new Point(row, col));
+        maze.setVisited(row, col, true);
+
+        if (maze.isExit(row, col)) {
+            return true;
+        }
+
+        for (int[] direction : directions) {
+            Point point = getNextCoordinate(row, col, direction[0], direction[1]);
+            if (explore(maze, point.getX(),point.getY(), path)) {
+                return true;
+            }
+        }
+
+        path.remove(path.size() - 1);
+        return false;
+    }
+
+
+
+
+
+
+
+
 
 
 
