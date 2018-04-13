@@ -70,19 +70,12 @@ public class MazeSolver {
         int mazeHeight = scanner.nextInt();
         Point mazeStart = new Point(scanner.nextInt(),scanner.nextInt());
         Point mazeEnd = new Point(scanner.nextInt(),scanner.nextInt());
-
-        System.out.println("" + mazeWidth+  mazeHeight + mazeStart.toString()+ mazeEnd.toString());
+        scanner.nextLine(); //consume new line after nextInt
+        System.out.println("" + mazeWidth+  mazeHeight + mazeStart.toString()+ mazeEnd.toString());//PRINT TEST
 
         char [][] mazeArray = new char[mazeHeight][mazeWidth];
         for(int row = 0; row<mazeHeight; row++){
-            mazeArray [row]={1,2,3,4,5,6,7,8,};//scanner.nextLine().split(" ").toString().toCharArray();
-        }
-
-        for(int row = 0; row<mazeHeight; row++){
-            for(int col = 0; col<mazeWidth; col++){
-                System.out.print(mazeArray[row][col]);
-            }
-            System.out.println("");
+           mazeArray[row]= scanner.nextLine().replaceAll("\\s+","").toCharArray();
         }
 
         MazeSolver maze = new MazeSolver(mazeWidth, mazeHeight, mazeStart, mazeEnd, mazeArray);
@@ -93,9 +86,9 @@ public class MazeSolver {
 
 
     public static void main(String[] args) throws FileNotFoundException {
-//        File f = new File("name.txt");
-//        System.out.println(f.getAbsolutePath());
         MazeSolver maze = readMaze();
+
+        //PRINT TEST!!!!!******!!!!
         for(int row = 0; row<maze.mazeHeight; row++){
             for(int col = 0; col<maze.mazeWidth; col++){
                 System.out.print(maze.mazeArray[row][col]);
