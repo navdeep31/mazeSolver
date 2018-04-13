@@ -13,6 +13,7 @@ public class MazeSolver {
     private Point mazeEnd;
     private char [][] mazeArray;
 
+    //Getters & Setters
     public int getMazeWidth() {
         return mazeWidth;
     }
@@ -45,12 +46,20 @@ public class MazeSolver {
         this.mazeEnd = mazeEnd;
     }
 
-    public char[][] getMaze() {
+    public char[][] getMazeArray() {
         return mazeArray;
     }
 
-    public void setMaze(char[][] mazeArray) {
+    public void setMazeArray(char[][] mazeArray) {
         this.mazeArray = mazeArray;
+    }
+
+    public char getMazeChar(int row, int col) {
+        return mazeArray[row][col];
+    }
+
+    public void setMazeChar(char mazeChar, int row, int col) {
+        this.mazeArray[row][col] = mazeChar;
     }
 
     //Constructor
@@ -82,6 +91,7 @@ public class MazeSolver {
         return maze;
 
     }
+
 
 
 
