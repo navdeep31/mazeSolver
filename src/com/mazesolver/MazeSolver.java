@@ -3,184 +3,135 @@ package com.mazesolver;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
-//http://www.baeldung.com/java-solve-maze
 public class MazeSolver {
 
     private int mazeWidth;
     private int mazeHeight;
-    private Point mazeStart;
-    private Point mazeEnd;
-    private char [][] mazeArray;
-
-    //Getters & Setters
-    public int getMazeWidth() {
-        return mazeWidth;
-    }
-
-    public void setMazeWidth(int mazeWidth) {
-        this.mazeWidth = mazeWidth;
-    }
-
-    public int getMazeHeight() {
-        return mazeHeight;
-    }
-
-    public void setMazeHeight(int mazeHeight) {
-        this.mazeHeight = mazeHeight;
-    }
-
-    public Point getMazeStart() {
-        return mazeStart;
-    }
-
-    public void setMazeStart(Point mazeStart) {
-        this.mazeStart = mazeStart;
-    }
-
-    public Point getMazeEnd() {
-        return mazeEnd;
-    }
-
-    public void setMazeEnd(Point mazeEnd) {
-        this.mazeEnd = mazeEnd;
-    }
-
-    public char[][] getMazeArray() {
-        return mazeArray;
-    }
-
-    public void setMazeArray(char[][] mazeArray) {
-        this.mazeArray = mazeArray;
-    }
-
-    public char getMazeChar(int row, int col) {
-        return mazeArray[row][col];
-    }
-
-    public void setMazeChar(char mazeChar, int row, int col) {
-        this.mazeArray[row][col] = mazeChar;
-    }
-
-    public boolean isValidLocation{
-
-    }
-
-    public boolean isExplored{
-
-    }
-
-    public boolean isWall{
-
-    }
-
-    public boolean setVisited{
-
-    }
-
-    public boolean isExit{
-
-    }
-
+    private static Point mazeStart;
+    private static Point mazeEnd;
+    private char [][] mazeMap;
 
     //Constructor
-    public MazeSolver(int mazeWidth, int mazeHeight, Point mazeStart, Point mazeEnd, char[][] mazeArray) {
+    public MazeSolver(int mazeWidth, int mazeHeight, Point mazeStart, Point mazeEnd, char[][] mazeMap) {
         this.mazeWidth = mazeWidth;
         this.mazeHeight = mazeHeight;
         this.mazeStart = mazeStart;
         this.mazeEnd = mazeEnd;
-        this.mazeArray = mazeArray;
+        this.mazeMap = mazeMap;
 
     }
 
-    //Load Maze File
-    public static MazeSolver readMaze() throws FileNotFoundException{
-        Scanner scanner = new Scanner(new File("maze.txt"));
+    //METHODS
+
+    //Read Maze File
+    private static MazeSolver readMaze(File mazeFile){
+        try {
+        Scanner scanner = new Scanner(mazeFile);
+
         int mazeWidth = scanner.nextInt();
         int mazeHeight = scanner.nextInt();
         Point mazeStart = new Point(scanner.nextInt(),scanner.nextInt());
         Point mazeEnd = new Point(scanner.nextInt(),scanner.nextInt());
         scanner.nextLine(); //consume new line after nextInt
-        System.out.println("" + mazeWidth+  mazeHeight + mazeStart.toString()+ mazeEnd.toString());//PRINT TEST
+        System.out.println("" + mazeWidth+  mazeHeight + mazeStart.toString()+ mazeEnd.toString());//PRINT TEST************************
 
         char [][] mazeArray = new char[mazeHeight][mazeWidth];
         for(int row = 0; row<mazeHeight; row++){
            mazeArray[row]= scanner.nextLine().replaceAll("\\s+","").toCharArray();
         }
+            MazeSolver ms = new MazeSolver(mazeWidth, mazeHeight, mazeStart, mazeEnd, mazeArray);
+            return ms;
 
-        MazeSolver maze = new MazeSolver(mazeWidth, mazeHeight, mazeStart, mazeEnd, mazeArray);
-        return maze;
-
-    }
-
-    //Array of possible directions - right, up, left, down
-    private static final int[][] directions = {{0,1},{1,0},{0,-1},{-1,0}};
-
-    //Calculate next coordinate path takes - current coordinate + a direction
-    private Point getNextCoordinate( int row, int col, int x, int y) {
-        return new Point(row + x, col + y);
-    }
-
-
-    //Solve
-    public List<Point> solve(MazeSolver maze) {
-        List<Point> path = new ArrayList<>();
-        if (explore(maze, maze.getEntry().getX(), maze.getEntry().getY(), path)) {
-            return path;
+        } catch (java.io.FileNotFoundException e){
+            System.out.println("Maze File not Found");
+            System.exit(1);
+            return null;
         }
-        return Collections.emptyList();
+
     }
 
-    //
-    private boolean explore(MazeSolver maze, int row, int col, List<Point> path) {
-        if (  !maze.isValidLocation(row, col) || maze.isWall(row, col)|| maze.isExplored(row, col) {
+    //Array of possible directions - N, E, S, W
+    private static final int[][] directions = {{1,0},{0,1},{-1,0},{0,-1}};
+
+    //Reformat maze to make it visually friendly
+    private void reformatMaze (){
+
+        mazeMap[mazeStart.y][mazeStart.x]= 'S';
+        mazeMap[mazeEnd.y][mazeEnd.x]= 'E';
+
+        for(int row = 0; row<mazeHeight;row++){
+            for(int col=0; col<mazeWidth; col++){
+                switch(mazeMap[row][col]){
+                    case '1': mazeMap[row][col] = '#'; break;
+                    case '0': mazeMap[row][col] = ' '; break;
+                }
+            }
+        }
+    }
+
+    //Recursive Depth First Search
+    private boolean solve (int row, int col){
+
+        //Check current position is not wall or has been already visited
+        if (mazeMap[row][col]=='#'||mazeMap[row][col] == 'X') {
             return false;
         }
 
-        path.add(new Point(row, col));
-        maze.setVisited(row, col, true);
-
-        if (maze.isExit(row, col)) {
+        //if current position exit then end recursion
+        if (mazeMap[row][col] == 'E') {
             return true;
         }
 
+        //mark current position as visited
+        mazeMap[row][col] = 'X';
+
+        //Recursive Method - loop through each possible direction until the method exit is reached
         for (int[] direction : directions) {
-            Point point = getNextCoordinate(row, col, direction[0], direction[1]);
-            if (explore(maze, point.getX(),point.getY(), path)) {
+            if (solve(row+direction[0],col+direction[1])==true) {
                 return true;
             }
         }
 
-        path.remove(path.size() - 1);
+        mazeMap[row][col] = ' ';
         return false;
+
     }
 
+    //Method to print solved maze with route
+   private void printMaze() {
 
+       mazeMap[mazeStart.y][mazeStart.x] = 'S';
+       for (int i = 0; i < mazeMap.length; i++) {
+           System.out.println(mazeMap[i]);
+       }
+   }
 
+    public static void main(String[] args) {
 
-
-
-
-
-
-
-
-
-    public static void main(String[] args) throws FileNotFoundException {
-        MazeSolver maze = readMaze();
-
-        //PRINT TEST!!!!!******!!!!
-        for(int row = 0; row<maze.mazeHeight; row++){
-            for(int col = 0; col<maze.mazeWidth; col++){
-                System.out.print(maze.mazeArray[row][col]);
+        //Load all .txt files in 'testMaze' folder
+        File[] mazeFiles = new File("testMazes").listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(".txt");
             }
-            System.out.println("");
+        });
+
+        //Loop through and solve all the .txts files loaded
+        for (File mazeFile : mazeFiles) {
+            System.out.println("Maze Input: " + mazeFile); //print out maze file name
+
+            MazeSolver mazeSolver = readMaze(mazeFile); //load the maze txt into the mazeSolver object
+            mazeSolver.reformatMaze();
+
+            if (mazeSolver.solve(mazeStart.y, mazeStart.x)) {
+                mazeSolver.printMaze();
+            } else {
+                System.out.println("Maze not solvable");
+            }
+
+            System.out.print("\n" + "\n" + "\n");
+
         }
-
-
-
     }
-
 
 }
